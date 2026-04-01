@@ -99,11 +99,11 @@ class DebateEnvironment:
         opp_refutation = self.reward_metrics.opponent_coverage(opponent_history,text)
         synthesis = self.reward_metrics.synthesis_score(text)
 
-        print(f"  DBG current_phase={self._state.current_phase}")
-        print(f"  DBG action.phase_tag={action.phase_tag}")
-        print(f"  DBG agent_history count={len(agent_history)}")
-        print(f"  DBG opponent_history count={len(opponent_history)}")
-        print(f"  DBG word_count={len(action.argument.split())}")
+        # print(f"  DBG current_phase={self._state.current_phase}")
+        # print(f"  DBG action.phase_tag={action.phase_tag}")
+        # print(f"  DBG agent_history count={len(agent_history)}")
+        # print(f"  DBG opponent_history count={len(opponent_history)}")
+        # print(f"  DBG word_count={len(action.argument.split())}")
 
         if action.phase_tag != self._state.current_phase:
             reward -= 1.0
@@ -212,30 +212,3 @@ class DebateEnvironment:
                 print(f"Openai API Error: {e}")
                 return "Error: Could not generate response."
     
-
-# env = DebateEnvironment()
-# obs = env.reset("AI should be regulated")
-
-# for i in range(5):
-#     action = DebateAction(
-#         argument="therefore this position is correct because evidence strongly supports it and proves the point",
-#         phase_tag=obs.phase.upper()
-#     )
-#     obs = env.step(action)
-#     print(f"Step {i+1}: phase={obs.phase} reward={obs.reward}")
-
-env = DebateEnvironment()
-obs = env.reset("AI should be regulated")
-
-test_args = [
-    "therefore AI regulation is necessary because unchecked systems cause harm to society",
-    "however critics argue that regulation stifles innovation and economic growth significantly",  
-    "this fails because evidence shows regulated industries like pharma still innovate effectively",
-    "taken together the evidence proves that smart regulation enables rather than blocks progress",
-    "in conclusion therefore regulation frameworks protect citizens while preserving innovation capacity",
-]
-
-for i, arg in enumerate(test_args):
-    action = DebateAction(argument=arg, phase_tag=obs.phase.upper())
-    obs = env.step(action)
-    print(f"Step {i+1}: phase={obs.phase} reward={obs.reward:.3f}")
