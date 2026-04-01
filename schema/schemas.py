@@ -3,8 +3,19 @@ from pydantic import BaseModel,Field
 from typing import List, Optional, Dict, Any
 
 class DebateAction(BaseModel):
-    argument:str
-    phase_tag: str
+    argument:str = Field(..., description="The textual argument submitted by the agent.")
+    phase_tag: str = Field(..., description="The current phase of the debate (e.g., OPENING, REBUTTAL).")
+
+    model_config = {
+            "json_schema_extra": {
+                "examples": [
+                    {
+                        "argument": "Regulating AGI globally is the only way to prevent an uncontrollable arms race between corporations.",
+                        "phase_tag": "OPENING"
+                    }
+                ]
+            }
+        }
     
 class DebateObservation(BaseModel):
     topic: str
