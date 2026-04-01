@@ -8,7 +8,7 @@ from schema.schemas import DebateState,DebateObservation,DebateAction
 from reward_metrics.reward_metrics import RewardMetrics
 from uuid import uuid4
 from collections import Counter
-
+import random
 
 import logging
 
@@ -48,7 +48,7 @@ class DebateEnvironment(Environment):
             self.picked_topic = random.choice(topics)
         else:
             self.picked_topic = topic
-            
+
 
         self.picked_topic = topic
         self._state = DebateState(
