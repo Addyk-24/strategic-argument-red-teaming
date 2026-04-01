@@ -1,0 +1,18 @@
+[project]
+name = "debate-coach-environment"
+version = "0.1.0"
+description = "Strategic Argument Red-Teaming Environment"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "openenv-core>=0.2.0",
+    "sentence-transformers",
+    "torch",
+    "openai",
+    "fastapi",
+    "uvicorn",
+    "pydantic"
+]
+
+[project.scripts]
+server = "server.app:main"
