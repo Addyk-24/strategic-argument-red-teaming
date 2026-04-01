@@ -29,7 +29,7 @@ api_key = os.getenv("HF_TOKEN")
 class DebateEnvironment(Environment):
 
     def __init__(self):
-        super.__init__()
+        super().__init__()
         self._state = DebateState()
         self.picked_topic = ""
         self.system_prompt = SystemPrompt(topic=self.picked_topic)
