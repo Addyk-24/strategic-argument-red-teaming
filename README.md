@@ -1,3 +1,13 @@
+---
+title: Strategic Argument Red Teaming
+emoji: ⚖️
+colorFrom: blue
+colorTo: red
+sdk: docker
+app_port: 7860
+pinned: false
+---
+
 # 🛡️ Strategic Argument Red-Teaming
 
 **An OpenEnv RL Benchmark for Multi-Turn Adversarial Reasoning and Policy Defense**

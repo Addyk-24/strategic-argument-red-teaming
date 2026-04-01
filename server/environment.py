@@ -12,7 +12,7 @@ from collections import Counter
 
 import logging
 
-from openai import OpenAI
+from openenv.core import Environment
 
 from prompter.system_prompt import SystemPrompt
 
@@ -26,9 +26,10 @@ logger = logging.getLogger(__name__)
 api_key = os.getenv("HF_TOKEN")
 
 
-class DebateEnvironment:
+class DebateEnvironment(Environment):
 
     def __init__(self):
+        super.__init__()
         self._state = DebateState()
         self.picked_topic = ""
         self.system_prompt = SystemPrompt(topic=self.picked_topic)
