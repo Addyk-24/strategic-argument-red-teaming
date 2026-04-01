@@ -1,6 +1,6 @@
 import uvicorn
 from openenv.core.env_server import create_fastapi_app
-from environment import DebateEnvironment
+from server.environment import DebateEnvironment
 from schema.schemas import DebateAction,DebateObservation
 
 app = create_fastapi_app(

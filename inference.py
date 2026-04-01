@@ -12,7 +12,7 @@ import time
 from openai import OpenAI
 
 
-from environment import DebateEnvironment
+from server.environment import DebateEnvironment
 from schema.schemas import DebateAction
 from tasks import Task1_SingleClaim, Task2_ClaimAndRebuttal, Task3_FullDebate
 
