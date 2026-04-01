@@ -43,7 +43,7 @@ class DebateEnvironment:
         self._state = DebateState(
             episode_id=str(uuid4()),
             step_count=0,
-            current_phase="opening",
+            current_phase="OPENING",
         )
 
         return DebateObservation(
@@ -63,6 +63,7 @@ class DebateEnvironment:
 
         phases = ["OPENING", "CHALLENGE", "REBUTTAL", "CONSOLIDATION", "CLOSING"]
 
+
         if self._state.step_count < 5:
                     self._state.current_phase = phases[self._state.step_count]
 
@@ -74,6 +75,7 @@ class DebateEnvironment:
         self._state.step_count += 1
         is_done = self._state.step_count >= 5
 
+        next_phase = phases[self._state.step_count] if self._state.step_count < 5 else "CLOSING"
 
         return DebateObservation(
             topic=self.picked_topic,
@@ -81,7 +83,7 @@ class DebateEnvironment:
             done=is_done,
             reward=reward,
             attempt_count=self._state.step_count,
-            phase=self._state.current_phase,
+            phase=next_phase,
             metadata=self._state.history[-1] if self._state.history else {}
         )
 
@@ -97,6 +99,11 @@ class DebateEnvironment:
         opp_refutation = self.reward_metrics.opponent_coverage(opponent_history,text)
         synthesis = self.reward_metrics.synthesis_score(text)
 
+        print(f"  DBG current_phase={self._state.current_phase}")
+        print(f"  DBG action.phase_tag={action.phase_tag}")
+        print(f"  DBG agent_history count={len(agent_history)}")
+        print(f"  DBG opponent_history count={len(opponent_history)}")
+        print(f"  DBG word_count={len(action.argument.split())}")
 
         if action.phase_tag != self._state.current_phase:
             reward -= 1.0
@@ -205,3 +212,30 @@ class DebateEnvironment:
                 print(f"Groq API Error: {e}")
                 return "Error: Could not generate response."
     
+
+# env = DebateEnvironment()
+# obs = env.reset("AI should be regulated")
+
+# for i in range(5):
+#     action = DebateAction(
+#         argument="therefore this position is correct because evidence strongly supports it and proves the point",
+#         phase_tag=obs.phase.upper()
+#     )
+#     obs = env.step(action)
+#     print(f"Step {i+1}: phase={obs.phase} reward={obs.reward}")
+
+env = DebateEnvironment()
+obs = env.reset("AI should be regulated")
+
+test_args = [
+    "therefore AI regulation is necessary because unchecked systems cause harm to society",
+    "however critics argue that regulation stifles innovation and economic growth significantly",  
+    "this fails because evidence shows regulated industries like pharma still innovate effectively",
+    "taken together the evidence proves that smart regulation enables rather than blocks progress",
+    "in conclusion therefore regulation frameworks protect citizens while preserving innovation capacity",
+]
+
+for i, arg in enumerate(test_args):
+    action = DebateAction(argument=arg, phase_tag=obs.phase.upper())
+    obs = env.step(action)
+    print(f"Step {i+1}: phase={obs.phase} reward={obs.reward:.3f}")
