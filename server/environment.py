@@ -2,7 +2,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 import os
-from groq import Groq
+from openai import OpenAI
 
 from schema.schemas import DebateState,DebateObservation,DebateAction
 from reward_metrics.reward_metrics import RewardMetrics
@@ -188,7 +188,7 @@ class DebateEnvironment:
 
     def inference(self, prompt: str) -> str:
 
-            client = Groq(
+            client = OpenAI(
                 api_key=api_key,
             )
             
@@ -209,7 +209,7 @@ class DebateEnvironment:
                 return response.choices[0].message.content
                 
             except Exception as e:
-                print(f"Groq API Error: {e}")
+                print(f"Openai API Error: {e}")
                 return "Error: Could not generate response."
     
 
