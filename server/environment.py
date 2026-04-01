@@ -35,10 +35,20 @@ class DebateEnvironment(Environment):
         self.system_prompt = SystemPrompt(topic=self.picked_topic)
         self.reward_metrics = RewardMetrics()
 
-    def reset(self,topic:str) -> DebateObservation:
+    def reset(self,topic:str=None) -> DebateObservation:
 
         attempt_count = 0
-
+        if topic is None:
+            topics = [
+                "Open-source AI models pose a significant security risk.",
+                "AI systems should be legally required to explain their decisions.",
+                "The development of AGI should be strictly regulated.",
+                "Autonomous AI agents should have legal liability."
+            ]
+            self.picked_topic = random.choice(topics)
+        else:
+            self.picked_topic = topic
+            
 
         self.picked_topic = topic
         self._state = DebateState(
