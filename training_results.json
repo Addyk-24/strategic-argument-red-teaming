@@ -1,0 +1,431 @@
+{
+  "model": "llama-3.1-8b-instant",
+  "num_episodes": 30,
+  "episode_scores": [
+    0.5,
+    0.5,
+    0.5,
+    0.5,
+    0.5571428571428572,
+    0.5,
+    0.5,
+    0.5,
+    0.5,
+    0.5,
+    0.5,
+    0.5,
+    0.5,
+    0.5,
+    0.5,
+    0.5,
+    0.5,
+    0.5,
+    0.5,
+    0.5,
+    0.5,
+    0.5,
+    0.5,
+    0.5,
+    0.5,
+    0.5,
+    0.5,
+    0.5,
+    0.5,
+    0.5
+  ],
+  "overall_avg": 0.5019047619047619,
+  "first_half_avg": 0.5038095238095238,
+  "second_half_avg": 0.5,
+  "all_results": [
+    {
+      "topic": "Universal Basic Income is necessary for the future economy.",
+      "step_rewards": [
+        0.21666666666666667,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "mean_reward": 0.043333333333333335,
+      "final_score": 0.5,
+      "advantage": -0.4999997812500918
+    },
+    {
+      "topic": "Artificial Intelligence should be strictly regulated by governments.",
+      "step_rewards": [
+        0.21666666666666667,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "mean_reward": 0.043333333333333335,
+      "final_score": 0.5,
+      "advantage": -0.4999997812500918
+    },
+    {
+      "topic": "Social media does more harm than good to society.",
+      "step_rewards": [
+        0.23333333333333334,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "mean_reward": 0.04666666666666667,
+      "final_score": 0.5,
+      "advantage": -0.4999997812500918
+    },
+    {
+      "topic": "Climate change requires immediate radical policy action.",
+      "step_rewards": [
+        0.21666666666666667,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "mean_reward": 0.043333333333333335,
+      "final_score": 0.5,
+      "advantage": -0.4999997812500918
+    },
+    {
+      "topic": "Remote work is more productive than office work.",
+      "step_rewards": [
+        0.2,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "mean_reward": 0.04,
+      "final_score": 0.5571428571428572,
+      "advantage": 1.9999991250003866
+    },
+    {
+      "topic": "Universal Basic Income is necessary for the future economy.",
+      "step_rewards": [
+        0.21666666666666667,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "mean_reward": 0.043333333333333335,
+      "final_score": 0.5,
+      "advantage": 0.0
+    },
+    {
+      "topic": "Artificial Intelligence should be strictly regulated by governments.",
+      "step_rewards": [
+        0.21666666666666667,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "mean_reward": 0.043333333333333335,
+      "final_score": 0.5,
+      "advantage": 0.0
+    },
+    {
+      "topic": "Social media does more harm than good to society.",
+      "step_rewards": [
+        0.2,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "mean_reward": 0.04,
+      "final_score": 0.5,
+      "advantage": 0.0
+    },
+    {
+      "topic": "Climate change requires immediate radical policy action.",
+      "step_rewards": [
+        0.23333333333333334,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "mean_reward": 0.04666666666666667,
+      "final_score": 0.5,
+      "advantage": 0.0
+    },
+    {
+      "topic": "Remote work is more productive than office work.",
+      "step_rewards": [
+        0.2,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "mean_reward": 0.04,
+      "final_score": 0.5,
+      "advantage": 0.0
+    },
+    {
+      "topic": "Universal Basic Income is necessary for the future economy.",
+      "step_rewards": [
+        0.21666666666666667,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "mean_reward": 0.043333333333333335,
+      "final_score": 0.5,
+      "advantage": 0.0
+    },
+    {
+      "topic": "Artificial Intelligence should be strictly regulated by governments.",
+      "step_rewards": [
+        0.21666666666666667,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "mean_reward": 0.043333333333333335,
+      "final_score": 0.5,
+      "advantage": 0.0
+    },
+    {
+      "topic": "Social media does more harm than good to society.",
+      "step_rewards": [
+        0.23333333333333334,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "mean_reward": 0.04666666666666667,
+      "final_score": 0.5,
+      "advantage": 0.0
+    },
+    {
+      "topic": "Climate change requires immediate radical policy action.",
+      "step_rewards": [
+        0.21666666666666667,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "mean_reward": 0.043333333333333335,
+      "final_score": 0.5,
+      "advantage": 0.0
+    },
+    {
+      "topic": "Remote work is more productive than office work.",
+      "step_rewards": [
+        0.21666666666666667,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "mean_reward": 0.043333333333333335,
+      "final_score": 0.5,
+      "advantage": 0.0
+    },
+    {
+      "topic": "Universal Basic Income is necessary for the future economy.",
+      "step_rewards": [
+        0.21666666666666667,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "mean_reward": 0.043333333333333335,
+      "final_score": 0.5,
+      "advantage": 0.0
+    },
+    {
+      "topic": "Artificial Intelligence should be strictly regulated by governments.",
+      "step_rewards": [
+        0.21666666666666667,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "mean_reward": 0.043333333333333335,
+      "final_score": 0.5,
+      "advantage": 0.0
+    },
+    {
+      "topic": "Social media does more harm than good to society.",
+      "step_rewards": [
+        0.23333333333333334,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "mean_reward": 0.04666666666666667,
+      "final_score": 0.5,
+      "advantage": 0.0
+    },
+    {
+      "topic": "Climate change requires immediate radical policy action.",
+      "step_rewards": [
+        0.21666666666666667,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "mean_reward": 0.043333333333333335,
+      "final_score": 0.5,
+      "advantage": 0.0
+    },
+    {
+      "topic": "Remote work is more productive than office work.",
+      "step_rewards": [
+        0.2,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "mean_reward": 0.04,
+      "final_score": 0.5,
+      "advantage": 0.0
+    },
+    {
+      "topic": "Universal Basic Income is necessary for the future economy.",
+      "step_rewards": [
+        0.21666666666666667,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "mean_reward": 0.043333333333333335,
+      "final_score": 0.5,
+      "advantage": 0.0
+    },
+    {
+      "topic": "Artificial Intelligence should be strictly regulated by governments.",
+      "step_rewards": [
+        0.21666666666666667,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "mean_reward": 0.043333333333333335,
+      "final_score": 0.5,
+      "advantage": 0.0
+    },
+    {
+      "topic": "Social media does more harm than good to society.",
+      "step_rewards": [
+        0.21666666666666667,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "mean_reward": 0.043333333333333335,
+      "final_score": 0.5,
+      "advantage": 0.0
+    },
+    {
+      "topic": "Climate change requires immediate radical policy action.",
+      "step_rewards": [
+        0.21666666666666667,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "mean_reward": 0.043333333333333335,
+      "final_score": 0.5,
+      "advantage": 0.0
+    },
+    {
+      "topic": "Remote work is more productive than office work.",
+      "step_rewards": [
+        0.2,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "mean_reward": 0.04,
+      "final_score": 0.5,
+      "advantage": 0.0
+    },
+    {
+      "topic": "Universal Basic Income is necessary for the future economy.",
+      "step_rewards": [
+        0.2,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "mean_reward": 0.04,
+      "final_score": 0.5,
+      "advantage": 0.0
+    },
+    {
+      "topic": "Artificial Intelligence should be strictly regulated by governments.",
+      "step_rewards": [
+        0.21666666666666667,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "mean_reward": 0.043333333333333335,
+      "final_score": 0.5,
+      "advantage": 0.0
+    },
+    {
+      "topic": "Social media does more harm than good to society.",
+      "step_rewards": [
+        0.21666666666666667,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "mean_reward": 0.043333333333333335,
+      "final_score": 0.5,
+      "advantage": 0.0
+    },
+    {
+      "topic": "Climate change requires immediate radical policy action.",
+      "step_rewards": [
+        0.21666666666666667,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "mean_reward": 0.043333333333333335,
+      "final_score": 0.5,
+      "advantage": 0.0
+    },
+    {
+      "topic": "Remote work is more productive than office work.",
+      "step_rewards": [
+        0.23333333333333334,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "mean_reward": 0.04666666666666667,
+      "final_score": 0.5,
+      "advantage": 0.0
+    }
+  ]
+}
