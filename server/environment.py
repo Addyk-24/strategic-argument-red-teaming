@@ -37,7 +37,6 @@ class DebateEnvironment(Environment):
 
     def reset(self,topic:str=None) -> DebateObservation:
 
-        attempt_count = 0
         if topic is None:
             topics = [
                 "Open-source AI models pose a significant security risk.",
@@ -50,7 +49,7 @@ class DebateEnvironment(Environment):
             self.picked_topic = topic
 
 
-        self.picked_topic = topic
+        attempt_count = 0
         self._state = DebateState(
             episode_id=str(uuid4()),
             step_count=0,
