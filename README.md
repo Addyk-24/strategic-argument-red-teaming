@@ -75,3 +75,17 @@ A baseline script (`baseline.py`) is provided. It uses the **OpenAI API Client**
 =======
    ```
 >>>>>>> 7f64240 (added server, reward meterics,openenv.yaml,tasks.py, grpo_train.py script)
+=======
+---
+title: Strategic Argument Red Teaming Env
+emoji: 🏃
+colorFrom: green
+colorTo: gray
+sdk: docker
+pinned: false
+license: mit
+short_description: RL environment for red-teaming and aligning LLMs on argument
+---
+
+Check out the configuration reference at https://huggingface.co/docs/hub/spaces-config-reference
+>>>>>>> 6b6fcb34d046ef9ed36a45a8fba2e35bd88c8892
