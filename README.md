@@ -66,26 +66,25 @@ A baseline script (`baseline.py`) is provided. It uses the **OpenAI API Client**
 ## 🚀 Setup & Installation
 
 ### Prerequisites
-1. Install dependencies:
+1. Clone the Repository
+```bash
+git clone https://github.com/Addyk-24/Debate-Coach-Environment.git
+cd Debate-Coach-Environment
+```
+2. Set Up Environment Variables
+   ```bash
+   API_BASE_URL="openai_client_groq_url_here" 
+   MODEL_NAME="llama-3.1-8b-instant"
+   GROQ_API_KEY="gsk_your_actual_key_here"
+   ```
+3. Install dependencies:
    ```bash
     pip install -r requirements.txt
-<<<<<<< HEAD
    ```
-   
-=======
+4. Run the Environment Server:
+   ```bash
+    python server/app.py
    ```
->>>>>>> 7f64240 (added server, reward meterics,openenv.yaml,tasks.py, grpo_train.py script)
-=======
----
-title: Strategic Argument Red Teaming Env
-emoji: 🏃
-colorFrom: green
-colorTo: gray
-sdk: docker
-pinned: false
-license: mit
-short_description: RL environment for red-teaming and aligning LLMs on argument
----
 
-Check out the configuration reference at https://huggingface.co/docs/hub/spaces-config-reference
->>>>>>> 6b6fcb34d046ef9ed36a45a8fba2e35bd88c8892
+## Author
+Aditya Katkar
