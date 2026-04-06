@@ -2,6 +2,8 @@
 FastAPI server exposing the Strategic Argument Red-Teaming Environment.
 Endpoints:
     GET  /              — Command Center UI (HTML)
+    GET  /docs          — Interactive OpenAPI (Swagger UI)
+    GET  /health        — Liveness probe (JSON)
     POST /reset         — Start a new debate
     POST /step          — Apply an argument action
     GET  /state         — Read current state without advancing
@@ -41,11 +43,11 @@ def _format_obs(obs: Any) -> dict[str, Any]:
     """Helper to convert your environment's observation object to a dictionary for JSON."""
     if obs is None:
         return None
-    # Adjust these keys based on your actual Observation object attributes
+    # Assuming these are properties in your environment's observation
     return {
         "opponent_challenge": getattr(obs, "opponent_challenge", "Episode Terminated."),
         "phase": getattr(obs, "phase", "ENDED"),
-        "history": getattr(obs, "history", []) # If your env tracks history, else we track in JS
+        "history": getattr(obs, "history", [])
     }
 
 # ── FRONTEND HTML/CSS/JS PAYLOAD ─────────────────────────────────────────────
@@ -59,16 +61,21 @@ _DEBUG_UI_HTML = """<!DOCTYPE html>
   <style>
     :root {
       --bg: #0f172a; --surface: #1e293b; --border: #334155; --text: #f8fafc;
-      --muted: #94a3b8; --accent: #0d9488; --exec: #0ea5e9; --exec-hover: #0284c7;
+      --muted: #94a3b8; --accent: #0ea5e9; --exec: #0ea5e9; --exec-hover: #0284c7;
       --card-blue: #2563eb; --card-orange: #ea580c; --card-green: #16a34a; --card-grey: #475569;
       --mono: ui-monospace, "Cascadia Code", monospace;
     }
     * { box-sizing: border-box; }
     body { margin: 0; min-height: 100vh; font-family: system-ui, sans-serif; background: var(--bg); color: var(--text); }
     .wrap { max-width: 60rem; margin: 0 auto; padding: 2rem 1rem; }
-    h1 { font-size: 1.5rem; margin: 0 0 0.5rem; }
-    .sub { color: var(--muted); font-size: 0.9rem; margin: 0 0 1.5rem; }
     
+    .page-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem; }
+    h1 { font-size: 1.5rem; margin: 0 0 0.25rem; }
+    .sub { color: var(--muted); font-size: 0.9rem; margin: 0; }
+    .sub a { color: var(--accent); text-decoration: none; } .sub a:hover { text-decoration: underline; }
+    .btn-mini { background: #fdfd96; color: #111; padding: 0.35rem 0.65rem; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 0.75rem; text-transform: uppercase; }
+    .btn-mini:hover { filter: brightness(1.1); }
+
     .panel { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1.25rem; margin-bottom: 1.25rem; }
     .metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 1.5rem; }
     .metric { padding: 1rem; border-radius: 8px; color: #fff; box-shadow: 0 4px 6px rgba(0,0,0,0.3); border-top: 4px solid; background: #1e293b; }
@@ -99,6 +106,10 @@ _DEBUG_UI_HTML = """<!DOCTYPE html>
     .tl-pos { color: #10b981; } .tl-neg { color: #ef4444; }
     .tl-body { font-size: 0.85rem; line-height: 1.4; color: var(--muted); }
     .tl-body strong { color: #e2e8f0; }
+
+    .tag { font-size: 0.75rem; color: var(--muted); margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: bold; }
+    pre { background: #0f172a; padding: 1rem; border-radius: 6px; border: 1px solid var(--border); overflow-x: auto; font-family: var(--mono); font-size: 0.8rem; margin: 0; color: #e2e8f0; }
+    .debug-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; margin-top: 1.25rem; }
     
     #toast { position: fixed; top: 1rem; right: 1rem; background: #ef4444; color: white; padding: 1rem; border-radius: 6px; display: none; z-index: 1000; box-shadow: 0 4px 12px rgba(0,0,0,0.5); }
     ::-webkit-scrollbar { width: 8px; } ::-webkit-scrollbar-track { background: #0f172a; } ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
@@ -107,8 +118,14 @@ _DEBUG_UI_HTML = """<!DOCTYPE html>
 <body>
   <div id="toast"></div>
   <div class="wrap">
-    <h1>Strategic Argument Red-Teaming</h1>
-    <p class="sub">OpenEnv Command Center • OPENING → CHALLENGE → REBUTTAL → CONSOLIDATION → CLOSING</p>
+    
+    <header class="page-head">
+      <div>
+        <h1>Strategic Argument Red-Teaming</h1>
+        <p class="sub">OpenEnv Command Center • OPENING → CLOSING · <a href="/health">/health</a></p>
+      </div>
+      <a class="btn-mini" href="/docs" target="_blank">Docs</a>
+    </header>
     
     <div class="metrics">
       <div class="metric" style="border-color: var(--card-blue);">
@@ -164,6 +181,27 @@ _DEBUG_UI_HTML = """<!DOCTYPE html>
         <div style="color: var(--muted); text-align: center; padding: 2rem;">No actions yet. Click Reset to begin.</div>
       </div>
     </div>
+
+    <div class="panel">
+      <div class="tag">observation</div>
+      <pre id="outObs">—</pre>
+    </div>
+    <div class="debug-grid">
+      <div class="panel" style="margin: 0;">
+        <div class="tag">reward (response)</div>
+        <pre id="outReward">—</pre>
+      </div>
+      <div class="panel" style="margin: 0;">
+        <div class="tag">done</div>
+        <pre id="outDone">—</pre>
+      </div>
+    </div>
+    <div class="panel" style="margin-top: 1.25rem;">
+      <div class="tag">info</div>
+      <pre id="outInfo">—</pre>
+    </div>
+    <p style="text-align: center; color: var(--muted); font-size: 0.8rem; margin-top: 1.5rem;">Built from dropdowns → POST /step. Toggle action type to edit fields.</p>
+
   </div>
 
 <script>
@@ -171,7 +209,6 @@ _DEBUG_UI_HTML = """<!DOCTYPE html>
   let currentPhase = "STANDBY";
   let stepCount = 0;
 
-  // The Magic Auto-Fill Dictionary!
   const AUTO_FILL = {
     "STANDBY": { tag: "OPENING", arg: "Universal Basic Income is an essential policy for the future economy. As automation and AI rapidly displace traditional jobs, UBI ensures a fundamental safety net, preventing mass poverty and maintaining consumer demand." },
     "OPENING": { tag: "CHALLENGE", arg: "While critics argue that UBI is too expensive or causes inflation, economic models show that when funded through progressive taxation—like a wealth tax—it does not trigger hyperinflation. It simply redistributes capital locally." },
@@ -212,7 +249,12 @@ _DEBUG_UI_HTML = """<!DOCTYPE html>
     $('pDiff').innerText = $('iDiff').value;
     $('oppText').innerText = obs.opponent_challenge || "Episode Terminated.";
 
-    // Only add to timeline if it's a step (not reset/state)
+    // Update Raw JSON displays
+    $('outObs').innerText = data.observation ? JSON.stringify(data.observation, null, 2) : "null";
+    $('outReward').innerText = data.reward !== undefined ? data.reward : "—";
+    $('outDone').innerText = data.done !== undefined ? data.done : "—";
+    $('outInfo').innerText = data.info ? JSON.stringify(data.info, null, 2) : "{}";
+
     if(data.action_taken) {
       stepCount++;
       const colorCls = reward >= 0 ? "tl-pos" : "tl-neg";
@@ -229,7 +271,7 @@ _DEBUG_UI_HTML = """<!DOCTYPE html>
           </div>
         </div>`;
       $('timeline').insertAdjacentHTML('beforeend', html);
-      $('timeline').scrollTop = $('timeline').scrollHeight; // auto-scroll
+      $('timeline').scrollTop = $('timeline').scrollHeight; 
     }
   }
 
@@ -249,7 +291,7 @@ _DEBUG_UI_HTML = """<!DOCTYPE html>
   async function doReset() {
     const data = await apiCall("/reset", { topic: $('iTopic').value, difficulty: $('iDiff').value });
     updateUI(data, true);
-    $('iArg').value = ""; // clear box
+    $('iArg').value = ""; 
   }
 
   async function doState() {
@@ -263,9 +305,9 @@ _DEBUG_UI_HTML = """<!DOCTYPE html>
     }
     const action = { phase_tag: $('iTag').value, argument: $('iArg').value };
     const data = await apiCall("/step", { action });
-    data.action_taken = action; // inject so updateUI can render it
+    data.action_taken = action; 
     updateUI(data);
-    $('iArg').value = ""; // clear box
+    $('iArg').value = ""; 
   }
 </script>
 </body>
@@ -274,15 +316,19 @@ _DEBUG_UI_HTML = """<!DOCTYPE html>
 
 # ── routes ───────────────────────────────────────────────────────────────────
 
-@app.get("/", response_class=HTMLResponse, tags=["Interface"])
+@app.get("/", response_class=HTMLResponse, tags=["Interface"], summary="Web Command Center")
 def ui() -> HTMLResponse:
     """Browser debug UI (HTML)."""
     return HTMLResponse(content=_DEBUG_UI_HTML)
 
+@app.get("/health", tags=["System"], summary="Health check")
+async def health() -> dict[str, str]:
+    """Return 'status: ok' when the server is up."""
+    return {"status": "ok"}
+
 @app.post("/reset", response_model=EnvResponse, tags=["Environment"])
 async def reset(req: ResetRequest) -> dict[str, Any]:
     """Start a new episode."""
-    # Assuming your DebateEnvironment has a reset method that accepts topic
     obs = _env.reset(req.topic)
     return {
         "observation": _format_obs(obs),
@@ -305,8 +351,7 @@ async def step(req: StepRequest) -> dict[str, Any]:
 @app.get("/state", response_model=EnvResponse, tags=["Environment"])
 async def state() -> dict[str, Any]:
     """Read current state."""
-    # If your env supports .state(), use it, otherwise mock it from the last step
-    obs = getattr(_env, "_state", None) # Fallback pseudo-code
+    obs = getattr(_env, "_state", None)
     return {
         "observation": _format_obs(obs),
         "reward": 0.0,
