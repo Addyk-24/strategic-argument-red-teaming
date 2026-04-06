@@ -6,8 +6,8 @@ from openai import OpenAI
 
 load_dotenv()
 
-from environment import DebateEnvironment
-from schema.schemas import DebateAction
+from envs.environment import DebateEnvironment
+from models.schemas import DebateAction
 import logging
 
 logging.getLogger("httpx").setLevel(logging.WARNING)

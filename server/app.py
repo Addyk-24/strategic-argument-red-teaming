@@ -1,27 +1,3 @@
-# import uvicorn
-# from openenv.core.env_server import create_fastapi_app
-# from server.environment import DebateEnvironment
-# from schema.schemas import DebateAction,DebateObservation
-
-# from fastapi.responses import RedirectResponse
-
-# app = create_fastapi_app(
-#     DebateEnvironment, 
-#     action_cls=DebateAction, 
-#     observation_cls=DebateObservation
-# )
-
-# @app.get("/")
-# def read_root():
-#     return RedirectResponse(url="/docs")
-
-# def main():
-#     uvicorn.run("server.app:app", host="0.0.0.0", port=7860)
-
-# if __name__ == "__main__":
-#     main()
-
-
 """
 FastAPI server exposing the Strategic Argument Red-Teaming Environment.
 Endpoints:
@@ -35,15 +11,23 @@ Endpoints:
 
 from __future__ import annotations
 import io
+import os
+import sys
+
+ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+if ROOT_DIR not in sys.path:
+    sys.path.insert(0, ROOT_DIR)
+
+
 from typing import Any, Literal
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import HTMLResponse
 from pydantic import BaseModel, ConfigDict, Field
 import uvicorn
 
-# Import your actual environment and schemas
-from environment import DebateEnvironment 
-from schema.schemas import DebateAction
+from envs.environment import DebateEnvironment 
+from envs.errors import EnvironmentNotResetError, EnvironmentDoneError
+from models.schemas import DebateAction
 
 # ── OpenAPI Documentation Setup ──────────────────────────────────────────────
 

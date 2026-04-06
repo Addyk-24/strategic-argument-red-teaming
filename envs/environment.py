@@ -4,7 +4,9 @@ load_dotenv()
 import os
 from openai import OpenAI
 
-from schema.schemas import DebateState,DebateObservation,DebateAction
+from .errors import EnvironmentDoneError, EnvironmentNotResetError
+
+from models.schemas import DebateState,DebateObservation,DebateAction
 from reward_metrics.reward_metrics import RewardMetrics
 from uuid import uuid4
 from collections import Counter

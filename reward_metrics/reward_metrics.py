@@ -33,7 +33,7 @@ class RewardMetrics:
     def _get_embedding(self,text:str):
         """Fetches embedding from cache, or computes it if not found."""
         if text not in self._embedding_cache:
-            self._embedding_cache[text] = model.encode(text,convert_to_tensor=True)
+            self._embedding_cache[text] = model.encode(text,convert_to_tensor=True,show_progress_bar=False)
         
         return self._embedding_cache[text]
 
