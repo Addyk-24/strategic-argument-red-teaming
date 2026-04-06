@@ -418,8 +418,12 @@ async def health() -> dict[str, str]:
     summary="Reset episode",
     response_description="Initial observation, zero reward, `done` false."
 )
-async def reset(req: ResetRequest) -> dict[str, Any]:
+async def reset(req: ResetRequest | None = None) -> dict[str, Any]:
     """Start a new episode with a specific topic and difficulty."""
+    # If the auto-grader sends an empty request, use the defaults!
+    if req is None:
+        req = ResetRequest()
+        
     obs = _env.reset(req.topic)
     return {
         "observation": _format_obs(obs),
