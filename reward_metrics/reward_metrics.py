@@ -1,13 +1,17 @@
-#similarity runs a full encode on every call — if called multiple times per step it's slow. This matters for training loops. Consider caching or batching, but not urgent right now.
+from dotenv import load_dotenv
+load_dotenv()
 
 from sentence_transformers import SentenceTransformer, util
 from transformers import logging as transformers_logging
 import logging
 import torch
+import os
 
 transformers_logging.set_verbosity_error()
 
-model = SentenceTransformer('all-MiniLM-L6-v2')
+hf_token = os.getenv("HF_TOKEN")
+
+model = SentenceTransformer('all-MiniLM-L6-v2',token=hf_token)
 
 
 class RewardMetrics:
