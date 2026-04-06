@@ -420,7 +420,6 @@ async def health() -> dict[str, str]:
 )
 async def reset(req: ResetRequest | None = None) -> dict[str, Any]:
     """Start a new episode with a specific topic and difficulty."""
-    # If the auto-grader sends an empty request, use the defaults!
     if req is None:
         req = ResetRequest()
         
