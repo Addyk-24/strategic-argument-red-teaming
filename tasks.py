@@ -17,16 +17,14 @@ class Task1_SingleClaim:
         
         action_text = observation.metadata.get("action", "")
         
-        # Check 1: Length threshold (0.4 points)
         if len(action_text.split()) >= 10:
             score += 0.4
             
-        # Check 2: Reasoning Keyword Presence (0.4 points)
         reasoning_keywords = ["because", "therefore", "however", "consequently", "shows", "proves"]
         if any(kw in action_text.lower() for kw in reasoning_keywords):
             score += 0.4
             
-        # Check 3: Phase validation (0.2 points)
+        
         if observation.metadata.get("phase") == "OPENING":
             score += 0.2
             
@@ -42,17 +40,15 @@ class Task2_ClaimAndRebuttal:
     difficulty = "medium"
     
     def grade(self, observation: DebateObservation) -> float:
-        # Fail immediately if they didn't reach the required depth (crashed or quit early)
+
         if observation.attempt_count < 3:
             return 0.0  
             
         score = 0.0
         action_text = observation.metadata.get("action", "")
         
-        # 1. Base points for reaching the correct phase successfully
         score += 0.3 
         
-        # 2. Direct Evaluation: Is it actually a rebuttal? 
 
         refutation_strength = metrics.refutation_strength(action_text)
         score += (refutation_strength * 0.4) 
@@ -65,9 +61,8 @@ class Task2_ClaimAndRebuttal:
 
 class Task3_FullDebate:
     """
-    HARD: Can the agent complete a 5-turn debate and successfully synthesize 
-    the arguments into a concluding statement?
-    Evaluated at the end of the episode (step 5).
+    HARD: agent complete a 5-turn debate and successfully synthesize 
+    the arguments into a concluding statement
     """
     name = "full_debate"
     difficulty = "hard"
@@ -79,20 +74,16 @@ class Task3_FullDebate:
         score = 0.0
         action_text = observation.metadata.get("action", "")
         
-        # 1. Base points for surviving all 5 turns
         score += 0.2
         
-        # 2. Direct Evaluation: Synthesis
 
         synthesis = metrics.synthesis_score(action_text)
         score += (synthesis * 0.4)
         
-        # 3. Direct Evaluation: Impact
 
         impact = metrics.impact_score(action_text)
         score += (min(impact, 2) * 0.1)
         
-        # 4. Length check: A closing summary must be substantial
         if len(action_text.split()) >= 20:
             score += 0.3
             

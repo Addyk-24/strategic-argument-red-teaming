@@ -18,9 +18,10 @@ from schema.schemas import DebateAction
 from tasks import Task1_SingleClaim, Task2_ClaimAndRebuttal, Task3_FullDebate
 
 # ── Config ────────────────────────────────────────────────────────────────────
-API_BASE_URL = os.getenv("API_BASE_URL", "https://api.groq.com/openai/v1")
-HF_TOKEN     = os.getenv("HF_TOKEN") or os.getenv("GROQ_API_KEY")
-MODEL_NAME   = os.getenv("MODEL_NAME", "llama-3.1-8b-instant")
+API_BASE_URL = os.getenv("API_BASE_URL")
+HF_TOKEN = os.getenv("HF_TOKEN")
+MODEL_NAME = os.getenv("MODEL_NAME", "llama-3.1-8b-instant")
+BENCHMARK = "strategic-argument-red-teaming"
 
 NUM_EPISODES       = 30   # total training episodes
 GROUP_SIZE         = 5    # GRPO: episodes per group for baseline calculation

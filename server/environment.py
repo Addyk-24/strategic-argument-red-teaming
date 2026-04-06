@@ -22,8 +22,9 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-
-api_key = os.getenv("HF_TOKEN")
+API_BASE_URL = os.getenv("API_BASE_URL")
+HF_TOKEN = os.getenv("HF_TOKEN")
+MODEL_NAME = os.getenv("MODEL_NAME")
 
 
 class DebateEnvironment(Environment):
@@ -199,7 +200,8 @@ class DebateEnvironment(Environment):
     def inference(self, prompt: str) -> str:
 
             client = OpenAI(
-                api_key=api_key,
+                base_url=API_BASE_URL,
+                api_key=HF_TOKEN
             )
             
             try:
@@ -211,7 +213,7 @@ class DebateEnvironment(Environment):
                         }
                     ],
 
-                    model="llama-3.1-8b-instant", 
+                    model=MODEL_NAME, 
                     temperature=0.7,
                     max_tokens=500,
                 )
