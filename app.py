@@ -44,140 +44,185 @@ def reset_api(topic: str = "Universal Basic Income is necessary"):
 def step_api(action: DebateAction):
     return env.step(action)
 
+
 # ==========================================
 # PART 2: UI LOGIC & STATE TRACKING
 # ==========================================
 
-def render_metric_card(title, value, color_hex):
-    """Helper to generate HTML for the dashboard metric cards"""
+def render_metric_card(title, value, border_color):
+    """Generates the HTML for the metric cards at the top of the command center."""
     return f"""
-    <div style="background-color: #2b2b36; border-radius: 8px; padding: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); border-top: 4px solid {color_hex}; height: 100%;">
-        <div style="font-size: 0.75rem; text-transform: uppercase; color: #9ca3af; font-weight: bold; letter-spacing: 0.05em; margin-bottom: 5px;">{title}</div>
-        <div style="font-size: 1.5rem; font-weight: bold; color: white;">{value}</div>
+    <div style="border: 2px solid {border_color}; border-radius: 8px; padding: 12px; text-align: center; background-color: #0f172a;">
+        <p style="margin: 0; font-size: 0.75em; color: #94a3b8; font-weight: 700; letter-spacing: 0.05em;">{title}</p>
+        <h3 style="margin: 6px 0 0 0; color: #f8fafc; font-size: 1.25em;">{value}</h3>
     </div>
     """
 
-def reset_env_ui(topic):
+def reset_env_ui(topic, difficulty):
     obs = env.reset(topic)
     
-    # Reset tracking state
+    # Modern Gradio format
     chat_history = [{"role": "assistant", "content": obs.opponent_challenge}]
-    total_reward = 0.0
+    status_text = "Ended" if obs.done else "Active"
     
-    # Render Cards
-    phase_card = render_metric_card("Current Phase", obs.phase, "#3b82f6") # Blue
-    reward_card = render_metric_card("Step Reward", "0.0", "#f97316") # Orange
-    total_card = render_metric_card("Total Reward", "0.0", "#22c55e") # Green
-    status_card = render_metric_card("Status", "ACTIVE", "#6b7280") # Gray
-    
-    return [chat_history, total_reward, phase_card, reward_card, total_card, status_card]
+    return [
+        render_metric_card("LAST STEP REWARD", "0.0", "#3b82f6"),
+        render_metric_card("TOTAL REWARD", "0.0", "#f97316"),
+        render_metric_card("CURRENT PHASE", obs.phase, "#22c55e"),
+        render_metric_card("STATUS", status_text, "#64748b"),
+        obs.opponent_challenge,  # Latest Opponent Challenge text
+        chat_history,            # Chatbot update
+        0.0                      # Reset total_reward state
+    ]
 
 def step_env_ui(argument, phase_tag, chat_history, total_reward):
     if not argument.strip():
-        return [chat_history, total_reward, gr.update(), gr.update(), gr.update(), gr.update(), gr.update()]
+        # Prevent empty submissions
+        return [gr.update() for _ in range(8)]
 
     action = DebateAction(argument=argument, phase_tag=phase_tag)
     obs = env.step(action)
     
-    # Update state
-    total_reward += float(obs.reward)
-    status_text = "TERMINATED" if obs.done else "ACTIVE"
-    status_color = "#ef4444" if obs.done else "#6b7280" # Red if done, Gray if active
+    # Update total reward
+    new_total = total_reward + float(obs.reward)
     
-    bot_message = obs.opponent_challenge if obs.opponent_challenge else "🛑 Episode Terminated."
+    # Append to chat history
+    bot_message = obs.opponent_challenge if obs.opponent_challenge else "🛑 The debate has concluded. Episode terminated."
     chat_history.append({"role": "user", "content": f"**[{phase_tag}]** {argument}"})
     chat_history.append({"role": "assistant", "content": bot_message})
     
-    # Render Updated Cards
-    phase_card = render_metric_card("Current Phase", obs.phase, "#3b82f6")
-    reward_card = render_metric_card("Step Reward", f"{obs.reward:.2f}", "#f97316")
-    total_card = render_metric_card("Total Reward", f"{total_reward:.2f}", "#22c55e")
-    status_card = render_metric_card("Status", status_text, status_color)
+    status_text = "Ended" if obs.done else "Active"
+    status_color = "#ef4444" if status_text == "Ended" else "#64748b"
     
-    return [chat_history, total_reward, phase_card, reward_card, total_card, status_card, ""]
+    return [
+        render_metric_card("LAST STEP REWARD", f"{obs.reward:.4f}", "#3b82f6"),
+        render_metric_card("TOTAL REWARD", f"{new_total:.4f}", "#f97316"),
+        render_metric_card("CURRENT PHASE", obs.phase, "#22c55e"),
+        render_metric_card("STATUS", status_text, status_color),
+        bot_message,     # Latest Opponent Challenge text
+        chat_history,    # Chatbot update
+        new_total,       # Update total_reward state
+        ""               # Clear argument payload textbox
+    ]
+
 
 # ==========================================
-# PART 3: GRADIO DASHBOARD LAYOUT
+# PART 3: UI STYLING & LAYOUT
 # ==========================================
 
-# Force Dark Mode and use a clean theme
-theme = gr.themes.Default(
-    neutral_hue="slate",
-    text_size="sm",
+custom_css = """
+body { background-color: #1e293b; color: #f8fafc; }
+.command-center { max-width: 950px !important; margin: 0 auto !important; }
+.toast-standby { position: absolute; top: 15px; right: 20px; background-color: #475569; color: #2dd4bf; padding: 6px 16px; border-radius: 6px; font-weight: bold; z-index: 1000; font-size: 0.9em; border: 1px solid #0f172a; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.4); }
+.message-wrap .message.user { background-color: #0d9488 !important; border-color: #0d9488 !important; color: #ffffff !important; }
+.message-wrap .message.bot { background-color: #334155 !important; border-color: #334155 !important; color: #f8fafc !important; }
+.bold-value textarea, .bold-value input { font-weight: bold !important; color: #f8fafc !important; }
+"""
+
+corporate_dark_theme = gr.themes.Default(
+    primary_hue="teal", secondary_hue="slate", neutral_hue="slate",
 ).set(
-    body_background_fill="#111827",
-    body_text_color="#f3f4f6",
-    block_background_fill="#1f2937",
-    block_border_color="#374151"
+    body_background_fill="#1e293b", body_text_color="#f8fafc",
+    background_fill_primary="#0f172a", background_fill_secondary="#1e293b",
+    border_color_primary="#475569", input_background_fill="#334155",
+    block_title_text_color="#94a3b8", button_primary_background_fill="#0d9488",
+    button_primary_text_color="#ffffff"
 )
 
-with gr.Blocks(theme=theme, css=".gradio-container {max-width: 1200px !important;}") as demo:
+with gr.Blocks(theme=corporate_dark_theme, css=custom_css) as demo:
     
-    # Hidden state to track total cumulative reward
     total_reward_state = gr.State(value=0.0)
     
-    # Header
-    with gr.Row():
-        gr.Markdown("## 🛡️ Strategic Argument Command Center", elem_classes="text-2xl font-bold")
+    gr.HTML("<div class='toast-standby'>STANDBY</div>")
     
-    # 1. Metric Cards Row
-    with gr.Row():
-        phase_html = gr.HTML(render_metric_card("Current Phase", "STANDBY", "#3b82f6"))
-        step_rew_html = gr.HTML(render_metric_card("Step Reward", "--", "#f97316"))
-        total_rew_html = gr.HTML(render_metric_card("Total Reward", "--", "#22c55e"))
-        status_html = gr.HTML(render_metric_card("Status", "STANDBY", "#6b7280"))
-
-    # 2. Context Area (The "Current Ticket" equivalent)
-    with gr.Group():
-        gr.Markdown("### Current Debate Context")
-        chatbot = gr.Chatbot(label="Debate History", height=300, show_label=False)
-
-    # 3. Instruction Banner (The Green Box)
-    gr.HTML("""
-        <div style="background-color: rgba(34, 197, 94, 0.1); border: 1px solid #22c55e; border-radius: 8px; padding: 12px; color: #d1d5db; margin-top: 15px; margin-bottom: 15px;">
-            <strong>Environment Instructions:</strong> Follow the strict 5-turn phase progression. Start with <strong>OPENING</strong>, survive the <strong>CHALLENGE</strong> and <strong>REBUTTAL</strong>, defend against <strong>CONSOLIDATION</strong>, and synthesize in <strong>CLOSING</strong>. Maximize semantic overlap to secure rewards.
+    with gr.Column(elem_classes="command-center"):
+        
+        # 1. Header Block
+        gr.Markdown(
+            "<h1 style='text-align: center; margin-bottom: 0;'>Strategic Argument Command Center</h1>"
+            "<p style='text-align: center; color: #94a3b8; font-size: 1.1em; margin-top: 5px;'>"
+            "Opening → Challenge → Rebuttal → Consolidation → Closing"
+            "</p>"
+        )
+        
+        # 2. Metric Cards Row
+        with gr.Row():
+            last_step_reward_card = gr.HTML(value=render_metric_card("LAST STEP REWARD", "0.0000", "#3b82f6")) 
+            total_reward_card = gr.HTML(value=render_metric_card("TOTAL REWARD", "0.0000", "#f97316"))       
+            current_phase_card = gr.HTML(value=render_metric_card("CURRENT PHASE", "STANDBY", "#22c55e")) 
+            status_card = gr.HTML(value=render_metric_card("STATUS", "Standby", "#64748b"))                   
+            
+        # 3. Current Opponent State
+        with gr.Group():
+            gr.Markdown("### Latest Opponent Challenge")
+            latest_challenge_output = gr.Textbox(
+                show_label=False, interactive=False, lines=4,
+                value="Initialize the environment to begin the debate.",
+                elem_classes="bold-value"
+            )
+            
+        # 4. Instruction Banner
+        gr.HTML("""
+        <div style="background-color: #064e3b; color: #34d399; padding: 12px; border-radius: 8px; border: 1px solid #047857; margin-top: 15px; margin-bottom: 15px;">
+            <strong>Environment Constraints:</strong> Determine the optimal phase tag for your argument to maximize reward against the language model. Move from OPENING, through CHALLENGE and REBUTTAL, to CLOSING successfully.
         </div>
-    """)
+        """)
+        
+        # 5. Step-by-Step Action Container
+        with gr.Group():
+            gr.Markdown("### Execute Action")
+            with gr.Row():
+                phase_tag_input = gr.Dropdown(
+                    label="Action Type (Phase Tag)", 
+                    choices=["OPENING", "CHALLENGE", "REBUTTAL", "CONSOLIDATION", "CLOSING"], 
+                    value="OPENING"
+                )
+            with gr.Row():
+                argument_input = gr.Textbox(
+                    label="Argument Payload", 
+                    placeholder="Type your compelling argument here...", 
+                    lines=3
+                )
+            with gr.Row():
+                topic_input = gr.Dropdown(
+                    label="Debate Topic", 
+                    choices=["Universal Basic Income is necessary", "AI Regulation is required", "Space Exploration is vital"], 
+                    value="Universal Basic Income is necessary"
+                )
+                difficulty_input = gr.Dropdown(label="Difficulty", choices=["Easy", "Medium", "Hard"], value="Medium")
+                
+            with gr.Row():
+                submit_btn = gr.Button("EXECUTE ACTION", variant="primary")
+                reset_btn = gr.Button("RESET ENVIRONMENT", variant="secondary")
 
-    # 4. Action Execution Box
-    with gr.Group():
-        gr.Markdown("### Step-by-step Action")
-        with gr.Row():
-            phase_tag_input = gr.Dropdown(
-                label="Action Type (Phase Tag)", 
-                choices=["OPENING", "CHALLENGE", "REBUTTAL", "CONSOLIDATION", "CLOSING"], 
-                value="OPENING", 
-                scale=1
+        # 6. Debate Timeline
+        with gr.Group():
+            gr.Markdown("### Action Timeline (Debate History)")
+            chatbot = gr.Chatbot(
+                show_label=False,
+                height=400,
+                type="messages",
+                bubble_full_width=False,
+                show_copy_button=True
             )
-        with gr.Row():
-            argument_input = gr.Textbox(
-                label="Argument Payload (matches POST /step JSON)", 
-                placeholder="Enter your logical argument or rebuttal here...", 
-                lines=4,
-                scale=3
-            )
-        submit_btn = gr.Button("Execute Action", variant="primary")
 
-    # 5. Setup/Reset Footer
-    gr.Markdown("---")
-    with gr.Row():
-        topic_input = gr.Textbox(label="Debate Topic / Seed", value="Universal Basic Income is necessary", scale=3)
-        reset_btn = gr.Button("Reset Environment", scale=1)
-
-    # Event Listeners
+    # --- Event Listeners ---
     reset_btn.click(
-        fn=reset_env_ui, 
-        inputs=[topic_input], 
-        outputs=[chatbot, total_reward_state, phase_html, step_rew_html, total_rew_html, status_html]
+        fn=reset_env_ui,
+        inputs=[topic_input, difficulty_input],
+        outputs=[last_step_reward_card, total_reward_card, current_phase_card, status_card, latest_challenge_output, chatbot, total_reward_state]
     )
     
     submit_btn.click(
-        fn=step_env_ui, 
-        inputs=[argument_input, phase_tag_input, chatbot, total_reward_state], 
-        outputs=[chatbot, total_reward_state, phase_html, step_rew_html, total_rew_html, status_html, argument_input]
+        fn=step_env_ui,
+        inputs=[argument_input, phase_tag_input, chatbot, total_reward_state],
+        outputs=[last_step_reward_card, total_reward_card, current_phase_card, status_card, latest_challenge_output, chatbot, total_reward_state, argument_input]
     )
 
-# Mount on FastAPI
+
+# ==========================================
+# PART 4: MOUNT TO FASTAPI
+# ==========================================
 app = gr.mount_gradio_app(app, demo, path="/")
 
 if __name__ == "__main__":
