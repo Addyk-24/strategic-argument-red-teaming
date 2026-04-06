@@ -70,8 +70,10 @@ def step_env_ui(argument, phase_tag, chat_history):
     action = DebateAction(argument=argument, phase_tag=phase_tag)
     obs = env.step(action)
     
+    bot_message = obs.opponent_challenge if obs.opponent_challenge else "🛑 The debate has concluded. The episode is now terminated. Please check your final score and reset!"
+    
     chat_history.append({"role": "user", "content": f"**[{phase_tag}]** {argument}"})
-    chat_history.append({"role": "assistant", "content": obs.opponent_challenge})
+    chat_history.append({"role": "assistant", "content": bot_message})
     
     return [chat_history, obs.phase, str(obs.reward), obs.done, ""]
 
