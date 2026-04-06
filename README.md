@@ -12,12 +12,22 @@ pinned: false
 
 **An OpenEnv RL Benchmark for Multi-Turn Adversarial Reasoning and Policy Defense**
 
-## 📖 Overview & Real-World Utility (30% Rubric Focus)
-As Large Language Models are increasingly deployed in enterprise environments for drafting corporate policies, legal summaries, and public relations statements, they must be capable of surviving hostile review processes. 
+## 🧠 The Problem: The "Multi-Turn" Vulnerability in LLMs
 
-This environment simulates a strategic **"Red-Teaming"** scenario. The agent acts as the defender of a claim and must successfully navigate a 5-phase adversarial debate against a dynamically generated, skeptical LLM opponent. 
+Modern Large Language Models (LLMs) are heavily tested against single-shot prompt injections (e.g., "ignore previous instructions"). However, real-world manipulation and misalignment rarely happen in a single turn.
 
-This is not a toy game; it is a direct simulation of **RLAIF (Reinforcement Learning from AI Feedback)** workflows used at frontier labs to align models against sycophancy (backing down too easily) while training them to maintain logical consistency, deliver strong refutations, and synthesize opposing viewpoints.
+Evaluating an LLM's robustness against sustained, logical persuasion over a long conversational horizon is incredibly difficult. Currently, testing this requires either expensive human red-teaming or static benchmarks that fail to capture the dynamic, evolving nature of a real debate. There is a lack of automated, reproducible environments to train and evaluate AI agents on long-term strategic argumentation.
+
+## 💡 The Solution: Strategic Argument Red Teaming
+
+This project introduces a custom Reinforcement Learning (RL) environment built on `openenv-core` designed to simulate and evaluate multi-turn adversarial debates.
+
+Instead of a simple question-and-answer format, this environment forces an Attacker Agent to systematically dismantle a Defender Model's arguments over a long-running trajectory.
+
+**Key Innovations:**
+- **Objective Evaluation:** The environment features a custom reward function that dynamically grades the agent based on argument coverage, logical refutation, and synthesis, while heavily penalizing repetitive dialogue.
+- **Scalable Trajectories:** The environment is structured into escalating evaluation tasks (ranging from 1-step claims to 5+ step full debates), allowing researchers to test both short-horizon tactics and delayed-gratification strategies.
+- **Provider Agnostic:** Fully integrated with the OpenAI client standard, allowing researchers to plug and play different open-source models via Hugging Face or Groq to test different model alignments against each other.
 
 ---
 
@@ -37,7 +47,7 @@ The environment enforces strict episode boundaries through a 5-turn state machin
   * `phase_tag` (str): The agent's awareness of the current environment phase.
 * **Observation (`DebateObservation`)**: 
   * `topic` (str): The debate topic.
-  * `opponent_challenge` (str): The dynamically generated counter-argument from the Groq-powered adversary.
+  * `opponent_challenge` (str): The dynamically generated counter-argument from the AI adversary.
   * `phase` (str): The current phase of the debate.
   * `reward` (float): The step-by-step reward signal `[-1.0, 1.0]`.
   * `done` (bool): Episode termination flag.
@@ -65,37 +75,36 @@ The environment includes three deterministic graders. **Crucially, the graders e
 ---
 
 ## 📊 Baseline Inference Scores
-A baseline script (`baseline.py`) is provided. It uses the **OpenAI API Client** (routed to Groq's `llama-3.1-8b-instant` for high-speed evaluation) to prove the environment provides a perfect learning gradient with substantial headroom for RL fine-tuning.
+A baseline script (`inference.py`) is provided. It uses the mandatory **OpenAI API Client** (routed to Hugging Face's serverless infrastructure using `Qwen2.5-72B-Instruct`) to prove the environment provides a perfect learning gradient with substantial headroom for RL fine-tuning.
 
 * **Task 1 (Easy):** `1.00 / 1.00` (The base model easily formulates initial claims).
 * **Task 2 (Medium):** `0.71 / 1.00` (The model survives but struggles to deliver mathematically perfect refutations).
-* **Task 3 (Hard):** `0.50 / 1.00` (The model survives 5 turns but completely fails to synthesize the opponent's arguments, proving significant headroom for GRPO training).
+* **Task 3 (Hard):** `0.50 / 1.00` (The model survives 5 turns but frequently fails to fully synthesize the opponent's arguments, proving significant headroom for GRPO training).
 
 ---
 
 ## 🚀 Setup & Installation
 
-### Prerequisites
-1. Install dependencies:
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/Addyk-24/Debate-Coach-Environment.git
+cd Debate-Coach-Environment
+```
+### 2. Set Up Environment Variables
+   ```bash
+   API_BASE_URL="openai_client_hf_url_here" 
+   HF_TOKEN="hf__key_here"
+   MODEL_NAME="Qwen/Qwen2.5-72B-Instruct"
+   ```
+### 3. Install dependencies:
    ```bash
     pip install -r requirements.txt
-<<<<<<< HEAD
    ```
-   
-=======
+### 4. Run the Environment Server:
+   ```bash
+    python inference.py
    ```
->>>>>>> 7f64240 (added server, reward meterics,openenv.yaml,tasks.py, grpo_train.py script)
-=======
----
-title: Strategic Argument Red Teaming Env
-emoji: 🏃
-colorFrom: green
-colorTo: gray
-sdk: docker
-pinned: false
-license: mit
-short_description: RL environment for red-teaming and aligning LLMs on argument
----
 
-Check out the configuration reference at https://huggingface.co/docs/hub/spaces-config-reference
->>>>>>> 6b6fcb34d046ef9ed36a45a8fba2e35bd88c8892
+## 👨‍💻 Author
+Aditya Katkar
