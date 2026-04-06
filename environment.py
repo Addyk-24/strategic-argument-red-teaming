@@ -23,7 +23,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 API_BASE_URL = os.getenv("API_BASE_URL")
-HF_TOKEN = os.getenv("HF_TOKEN")
+api_key = os.getenv("HF_TOKEN")
 MODEL_NAME = os.getenv("MODEL_NAME")
 
 
@@ -201,7 +201,7 @@ class DebateEnvironment(Environment):
 
             client = OpenAI(
                 base_url=API_BASE_URL,
-                api_key=HF_TOKEN
+                api_key=api_key
             )
             
             try:
