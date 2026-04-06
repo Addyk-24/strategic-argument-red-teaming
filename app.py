@@ -1,3 +1,27 @@
+# import uvicorn
+# from openenv.core.env_server import create_fastapi_app
+# from server.environment import DebateEnvironment
+# from schema.schemas import DebateAction,DebateObservation
+
+# from fastapi.responses import RedirectResponse
+
+# app = create_fastapi_app(
+#     DebateEnvironment, 
+#     action_cls=DebateAction, 
+#     observation_cls=DebateObservation
+# )
+
+# @app.get("/")
+# def read_root():
+#     return RedirectResponse(url="/docs")
+
+# def main():
+#     uvicorn.run("server.app:app", host="0.0.0.0", port=7860)
+
+# if __name__ == "__main__":
+#     main()
+
+
 """
 FastAPI server exposing the Strategic Argument Red-Teaming Environment.
 Endpoints:
@@ -21,30 +45,91 @@ import uvicorn
 from environment import DebateEnvironment 
 from schema.schemas import DebateAction
 
-app = FastAPI(title="Strategic Argument Command Center", version="1.0.0")
+# ── OpenAPI Documentation Setup ──────────────────────────────────────────────
+
+_OPENAPI_TAGS = [
+    {
+        "name": "Environment",
+        "description": (
+            "Episode lifecycle for the adversarial debate RL environment: "
+            "call **reset** before **step**; use **state** to inspect without advancing."
+        ),
+    },
+    {
+        "name": "Interface",
+        "description": "Browser UI for manual debugging (HTML, not JSON).",
+    },
+    {
+        "name": "System",
+        "description": "Health checks.",
+    },
+]
+
+app = FastAPI(
+    title="OpenEnv Strategic Argument Red-Teaming",
+    version="1.0.0",
+    openapi_tags=_OPENAPI_TAGS,
+    description=(
+        "Real-world adversarial debate environment for [OpenEnv](https://github.com/open-env). "
+        "Typical workflow: **OPENING** → **CHALLENGE** → **REBUTTAL** → **CONSOLIDATION** → **CLOSING**. "
+    ),
+)
+
 _env = DebateEnvironment()
 
 # ── request / response schemas ───────────────────────────────────────────────
 
 class ResetRequest(BaseModel):
-    topic: str = Field(default="Universal Basic Income is necessary")
-    difficulty: Literal["easy", "medium", "hard"] = Field(default="medium")
+    """Start a new episode; initializes the opponent's starting stance."""
+    model_config = ConfigDict(
+        json_schema_extra={
+            "examples": [
+                {"topic": "Universal Basic Income is necessary", "difficulty": "medium"}
+            ]
+        }
+    )
+    topic: str = Field(
+        default="Universal Basic Income is necessary",
+        description="The core debate topic the agent must defend."
+    )
+    difficulty: Literal["easy", "medium", "hard"] = Field(
+        default="medium",
+        description="Difficulty level of the LLM adversary."
+    )
 
 class StepRequest(BaseModel):
-    action: DebateAction
+    """Apply one agent action. Must provide the argument text and current phase tag."""
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {
+                "action": {
+                    "argument": "Universal Basic Income is an essential policy...",
+                    "phase_tag": "OPENING"
+                }
+            }
+        }
+    )
+    action: DebateAction = Field(
+        description="The agent's argument payload and phase tracking."
+    )
 
 class EnvResponse(BaseModel):
-    observation: dict[str, Any] | None
-    reward: float
-    done: bool
-    info: dict[str, Any] = Field(default_factory=dict)
+    """Observation and reward after reset, step, or state."""
+    observation: dict[str, Any] | None = Field(
+        description="Includes the opponent's challenge and current phase. `null` if reset has not been called."
+    )
+    reward: float = Field(description="Reward for the last transition; 0.0 on reset and GET /state.")
+    done: bool = Field(description="True after the episode concludes or hits the turn limit.")
+    info: dict[str, Any] = Field(
+        default_factory=dict,
+        description="Diagnostics (e.g., difficulty, semantic scores).",
+    )
 
 
 def _format_obs(obs: Any) -> dict[str, Any]:
     """Helper to convert your environment's observation object to a dictionary for JSON."""
     if obs is None:
         return None
-    # Assuming these are properties in your environment's observation
     return {
         "opponent_challenge": getattr(obs, "opponent_challenge", "Episode Terminated."),
         "phase": getattr(obs, "phase", "ENDED"),
@@ -210,19 +295,13 @@ _DEBUG_UI_HTML = """<!DOCTYPE html>
   let currentPhase = "STANDBY";
   let stepCount = 0;
 
-const AUTO_FILL = {
+  const AUTO_FILL = {
     "STANDBY": { tag: "OPENING", arg: "Universal Basic Income is an essential policy for the future economy. As automation and AI rapidly displace traditional jobs, UBI ensures a fundamental safety net, preventing mass poverty and maintaining consumer demand." },
-    
     "OPENING": { tag: "OPENING", arg: "Universal Basic Income is an essential policy for the future economy. As automation and AI rapidly displace traditional jobs, UBI ensures a fundamental safety net, preventing mass poverty and maintaining consumer demand." },
-    
     "CHALLENGE": { tag: "CHALLENGE", arg: "While critics argue that UBI is too expensive or causes inflation, economic models show that when funded through progressive taxation—like a wealth tax—it does not trigger hyperinflation. It simply redistributes capital locally." },
-    
     "REBUTTAL": { tag: "REBUTTAL", arg: "Furthermore, the assumption that UBI destroys the incentive to work is contradicted by real-world data. Pilot programs demonstrate that freed from survival stress, people invest more time in education and small businesses." },
-    
     "CONSOLIDATION": { tag: "CONSOLIDATION", arg: "Looking at the macroeconomic scale, the velocity of money generated by UBI actually creates a robust, bottom-up economic stimulus that far outweighs the initial taxation costs required to implement it." },
-    
     "CLOSING": { tag: "CLOSING", arg: "Ultimately, Universal Basic Income is not just a welfare handout; it is a necessary economic stabilizer for the 21st century. It enables human innovation and builds a resilient society against technological disruption." },
-    
     "ENDED": { tag: "CLOSING", arg: "The debate is over." }
   };
 
@@ -256,7 +335,6 @@ const AUTO_FILL = {
     $('pDiff').innerText = $('iDiff').value;
     $('oppText').innerText = obs.opponent_challenge || "Episode Terminated.";
 
-    // Update Raw JSON displays
     $('outObs').innerText = data.observation ? JSON.stringify(data.observation, null, 2) : "null";
     $('outReward').innerText = data.reward !== undefined ? data.reward : "—";
     $('outDone').innerText = data.done !== undefined ? data.done : "—";
@@ -325,17 +403,23 @@ const AUTO_FILL = {
 
 @app.get("/", response_class=HTMLResponse, tags=["Interface"], summary="Web Command Center")
 def ui() -> HTMLResponse:
-    """Browser debug UI (HTML)."""
+    """Browser debug UI (HTML). Use **GET /** in the browser; API clients should use JSON endpoints below."""
     return HTMLResponse(content=_DEBUG_UI_HTML)
 
 @app.get("/health", tags=["System"], summary="Health check")
 async def health() -> dict[str, str]:
-    """Return 'status: ok' when the server is up."""
+    """Return `{\"status\": \"ok\"}` when the server is up."""
     return {"status": "ok"}
 
-@app.post("/reset", response_model=EnvResponse, tags=["Environment"])
+@app.post(
+    "/reset", 
+    response_model=EnvResponse, 
+    tags=["Environment"], 
+    summary="Reset episode",
+    response_description="Initial observation, zero reward, `done` false."
+)
 async def reset(req: ResetRequest) -> dict[str, Any]:
-    """Start a new episode."""
+    """Start a new episode with a specific topic and difficulty."""
     obs = _env.reset(req.topic)
     return {
         "observation": _format_obs(obs),
@@ -344,9 +428,14 @@ async def reset(req: ResetRequest) -> dict[str, Any]:
         "info": {"difficulty": req.difficulty}
     }
 
-@app.post("/step", response_model=EnvResponse, tags=["Environment"])
+@app.post(
+    "/step", 
+    response_model=EnvResponse, 
+    tags=["Environment"], 
+    summary="Step environment"
+)
 async def step(req: StepRequest) -> dict[str, Any]:
-    """Apply one agent action."""
+    """Apply one agent action. Must match the correct phase progression to avoid penalties."""
     obs = _env.step(req.action)
     return {
         "observation": _format_obs(obs),
@@ -355,9 +444,14 @@ async def step(req: StepRequest) -> dict[str, Any]:
         "info": {}
     }
 
-@app.get("/state", response_model=EnvResponse, tags=["Environment"])
+@app.get(
+    "/state", 
+    response_model=EnvResponse, 
+    tags=["Environment"], 
+    summary="Get state"
+)
 async def state() -> dict[str, Any]:
-    """Read current state."""
+    """Read the current observation without advancing time. If `reset` was never called, `observation` is `null`."""
     obs = getattr(_env, "_state", None)
     return {
         "observation": _format_obs(obs),
