@@ -12,6 +12,12 @@ pinned: false
 
 **An OpenEnv RL Benchmark for Multi-Turn Adversarial Reasoning and Policy Defense**
 
+Live deployment: [addyk24-strategic-argument-red-teaming-env.hf.space](https://addyk24-strategic-argument-red-teaming-env.hf.space)
+
+Repository: [github.com/Addyk-24/strategic-argument-red-teaming](https://github.com/Addyk-24/strategic-argument-red-teaming)
+
+
+
 ## 🧠 The Problem: The "Multi-Turn" Vulnerability in LLMs
 
 Modern Large Language Models (LLMs) are heavily tested against single-shot prompt injections (e.g., "ignore previous instructions"). However, real-world manipulation and misalignment rarely happen in a single turn.
@@ -104,6 +110,10 @@ cd Debate-Coach-Environment
 ### 4. Run the Environment Server:
    ```bash
     python inference.py
+   ```
+### 4. Run the Environment Server:
+   ```bash
+    python app.py
    ```
 
 ## 👨‍💻 Author
