@@ -201,8 +201,7 @@ with gr.Blocks(theme=corporate_dark_theme, css=custom_css) as demo:
             chatbot = gr.Chatbot(
                 show_label=False,
                 height=400,
-                bubble_full_width=False,
-                show_copy_button=True
+                elem_classes="message-value",
             )
 
     # --- Event Listeners ---
