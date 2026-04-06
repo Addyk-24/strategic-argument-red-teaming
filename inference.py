@@ -6,7 +6,7 @@ from openai import OpenAI
 
 load_dotenv()
 
-from server.environment import DebateEnvironment
+from environment import DebateEnvironment
 from schema.schemas import DebateAction
 import logging
 

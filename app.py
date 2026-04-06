@@ -27,7 +27,7 @@ import uvicorn
 
 # 1. Import your actual environment
 from environment import DebateEnvironment 
-from openenv.schemas import DebateAction
+from schema.schemas import DebateAction
 
 # Initialize FastAPI and your Environment
 app = FastAPI()
@@ -93,7 +93,7 @@ with gr.Blocks(theme=gr.themes.Soft()) as demo:
             
         with gr.Column(scale=2):
             gr.Markdown("### 💬 Chat Interface (The Debate)")
-            chatbot = gr.Chatbot(label="Debate History", height=450, type="messages")
+            chatbot = gr.Chatbot(label="Debate History", height=450)
             
             gr.Markdown("### ⚡ Execute Action")
             with gr.Row():
