@@ -38,6 +38,7 @@ class EnvResponse(BaseModel):
     reward: float
     done: bool
     info: dict[str, Any] = Field(default_factory=dict)
+    
 
 def _format_obs(obs: Any) -> dict[str, Any]:
     """Helper to convert your environment's observation object to a dictionary for JSON."""
