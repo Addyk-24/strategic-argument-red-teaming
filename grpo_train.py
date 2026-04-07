@@ -35,7 +35,7 @@ TOPICS = [
     "Remote work is more productive than office work.",
 ]
 
-client = OpenAI(base_url=API_BASE_URL, api_key=HF_TOKEN)
+client = OpenAI(base_url=API_BASE_URL, api_key=HF_TOKEN,timeout=1800,max_retries=2,)
 
 def generate_argument(topic: str, phase: str, opponent_challenge: str,
                       temperature: float = 0.7) -> str:

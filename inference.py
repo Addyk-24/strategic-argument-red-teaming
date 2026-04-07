@@ -19,7 +19,9 @@ BENCHMARK = "strategic-argument-red-teaming"
 
 client = OpenAI(
     base_url=API_BASE_URL,
-    api_key=api_key
+    api_key=api_key,
+    timeout=1800,
+    max_retries=2,
 )
 
 # STDOUT LOGGING FUNCTIONS 
