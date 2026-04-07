@@ -20,7 +20,7 @@ BENCHMARK = "strategic-argument-red-teaming"
 client = OpenAI(
     base_url=API_BASE_URL,
     api_key=api_key,
-    timeout=1800,
+    timeout=45.0,
     max_retries=2,
 )
 
@@ -107,8 +107,10 @@ def evaluate_task(env, topic: str, task_name: str, max_steps: int):
         error = str(e)
         success = False
     finally:
-        log_end(success=success, steps=step_count, score=sum(rewards), rewards=rewards)
+        raw_score = sum(rewards)
+        safe_logged_score = float(max(0.01, min(0.99, raw_score)))
 
+        log_end(success=success, steps=step_count, score=safe_logged_score, rewards=rewards)
 
 def evaluate_baseline():
     
