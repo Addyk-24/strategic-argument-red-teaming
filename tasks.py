@@ -1,4 +1,4 @@
-from schema.schemas import DebateObservation
+from models.schemas import DebateObservation
 from reward_metrics.reward_metrics import RewardMetrics
 
 
@@ -28,7 +28,7 @@ class Task1_SingleClaim:
         if observation.metadata.get("phase") == "OPENING":
             score += 0.2
             
-        return min(1.0, score)
+        return max(0.01, min(0.99, score))
 
 
 class Task2_ClaimAndRebuttal:
@@ -56,7 +56,7 @@ class Task2_ClaimAndRebuttal:
         if len(action_text.split()) > 15:
             score += 0.3
             
-        return min(1.0, score)
+        return max(0.01, min(0.99, score))
 
 
 class Task3_FullDebate:
@@ -87,4 +87,4 @@ class Task3_FullDebate:
         if len(action_text.split()) >= 20:
             score += 0.3
             
-        return max(0.0, min(1.0, score))
+        return max(0.01, min(0.99, score))

@@ -14,7 +14,7 @@ from collections import defaultdict
 from openai import OpenAI
 
 from envs.environment import DebateEnvironment
-from schema.schemas import DebateAction
+from models.schemas import DebateAction
 from tasks import Task1_SingleClaim, Task2_ClaimAndRebuttal, Task3_FullDebate
 
 # ── Config ────────────────────────────────────────────────────────────────────
