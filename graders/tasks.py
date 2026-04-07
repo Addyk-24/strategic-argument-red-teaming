@@ -42,8 +42,7 @@ class Task2_ClaimAndRebuttal:
     def grade(self, observation: DebateObservation) -> float:
 
         if observation.attempt_count < 3:
-            return 0.0  
-            
+            return 0.01 
         score = 0.0
         action_text = observation.metadata.get("action", "")
         
@@ -69,8 +68,8 @@ class Task3_FullDebate:
     
     def grade(self, observation: DebateObservation) -> float:
         if not observation.done or observation.attempt_count < 5:
-            return 0.0
-            
+            return 0.01
+
         score = 0.0
         action_text = observation.metadata.get("action", "")
         
