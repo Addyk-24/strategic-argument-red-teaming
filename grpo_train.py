@@ -15,7 +15,7 @@ from openai import OpenAI
 
 from envs.environment import DebateEnvironment
 from models.schemas import DebateAction
-from tasks import Task1_SingleClaim, Task2_ClaimAndRebuttal, Task3_FullDebate
+from graders.tasks import Task1_SingleClaim, Task2_ClaimAndRebuttal, Task3_FullDebate
 
 # ── Config ────────────────────────────────────────────────────────────────────
 API_BASE_URL = os.getenv("API_BASE_URL")
